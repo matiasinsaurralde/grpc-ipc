@@ -8,7 +8,7 @@ type SettingsSpec struct {
 
 // PoolSpec holds the information needed for initializing a Pool.
 type PoolSpec struct {
-	PoolSize      int      `json:"pool_size"`
-	PoolCmd       []string `json:"pool_cmd"`
-	PoolPortRange []int    `json:"pool_port_range"`
+	Size      int      `json:"pool_size"`
+	Cmd       []string `json:"pool_cmd"`
+	PortRange []int    `json:"pool_port_range"`
 }
