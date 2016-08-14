@@ -1,4 +1,4 @@
-package main
+package grpc_ipc
 
 // SettingsSpec is the top structure for mapping the JSON settings file.
 type SettingsSpec struct {

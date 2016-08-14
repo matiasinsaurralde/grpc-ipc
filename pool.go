@@ -1,4 +1,4 @@
-package main
+package grpc_ipc
 
 import (
 	"log"
