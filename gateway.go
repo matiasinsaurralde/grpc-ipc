@@ -1,9 +1,10 @@
-package main
+package grpc_ipc
 
 import (
 	"io"
 	"log"
 	"net"
+	"time"
 )
 
 // Gateway holds the basic gateway structure, the grpc.Server is contained here. It should be possible to create more than one "gateway" instance.
@@ -57,8 +58,14 @@ func (g *Gateway) handle(conn *net.UnixConn) {
 	worker := g.pool.PickWorker()
 	// log.Println("Picking worker", worker.addr)
 	proxyConn, _ := net.DialUnix("unix", nil, worker.addr)
+
 	go copyAndClose(proxyConn, conn)
 	go copyAndClose(conn, proxyConn)
+
+	time.Sleep(2 * time.Second)
+	proxyConn.Close()
+	conn.Close()
+
 }
 
 // As seen in github.com/elazarl/goproxy
