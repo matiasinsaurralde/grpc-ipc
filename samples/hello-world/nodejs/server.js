@@ -36,6 +36,13 @@ var PROTO_PATH = __dirname + '../proto/';
 var grpc = require('grpc');
 var hello_proto = grpc.load('../proto/helloworld.proto').helloworld;
 
+var port = process.env.PORT
+if(!port) {
+  console.log('No port specified')
+  process.exit(1);
+}
+var listen_address = ['127.0.0.1', port].join(':')
+
 function sayHello(call, callback) {
   callback(null, {message: 'Hello ' + call.request.name});
 }
@@ -43,7 +50,7 @@ function sayHello(call, callback) {
 function main() {
   var server = new grpc.Server();
   server.addProtoService(hello_proto.Greeter.service, {sayHello: sayHello});
-  server.bind('127.0.0.1:5555', grpc.ServerCredentials.createInsecure());
+  server.bind( listen_address, grpc.ServerCredentials.createInsecure());
   server.start();
 }
 
