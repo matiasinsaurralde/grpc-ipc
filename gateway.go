@@ -1,29 +1,26 @@
 package main
 
 import(
-  "log"
-  "io/ioutil"
-  "encoding/json"
+  "net"
+  "google.golang.org/grpc"
 )
 
-var Settings *SettingsSpec
-
-func init() {
-  log.Println("Starting grpc-ipc")
-
-  var settingsData []byte
-  var err error
-
-  settingsData, err = ioutil.ReadFile("settings.json")
-  if err != nil {
-    panic(err)
-  }
-
-  Settings = &SettingsSpec{}
-
-  json.Unmarshal(settingsData, Settings)
+type Gateway struct {
+  grpc *grpc.Server
+  listener net.Listener
+  listenAddress string
 }
 
-func main() {
+func NewGateway(listenAddress string) Gateway {
+  gw := Gateway{
+    grpc: grpc.NewServer(),
+    listenAddress: listenAddress,
+  }
+  return gw
+}
 
+func(g *Gateway) Serve() (err error) {
+  g.listener, err = net.Listen( "tcp", g.listenAddress )
+  g.grpc = grpc.NewServer()
+  return err
 }
