@@ -36,6 +36,8 @@ package main
 import (
 	"log"
 	"os"
+	"net"
+	"time"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -43,13 +45,17 @@ import (
 )
 
 const (
-	address     = "localhost:5555"
+	address     = "/tmp/gogo"
 	defaultName = "world"
 )
 
+func dialer(addr string, timeout time.Duration) (net.Conn, error) {
+	return net.DialTimeout("unix", addr, timeout)
+}
+
 func main() {
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithDialer(dialer))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
