@@ -6,7 +6,7 @@ import (
 	"net"
 	"os/exec"
 	"path"
-  "strings"
+	"strings"
 
 	"github.com/dchest/uniuri"
 )
@@ -22,7 +22,7 @@ type Worker struct {
 
 // Prepare will set the socket path.
 func (w *Worker) Prepare() (err error) {
-  socketFile := strings.Join([]string{uriPrefix, uniuri.New()}, "")
+	socketFile := strings.Join([]string{uriPrefix, uniuri.New()}, "")
 	socketPath := path.Join("/tmp", socketFile)
 	w.addr, err = net.ResolveUnixAddr("unix", socketPath)
 

@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
-  "os"
-  "os/signal"
-  "syscall"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 var settings *SettingsSpec
@@ -28,14 +28,14 @@ func init() {
 }
 
 func main() {
-  pool := NewPool( settings.Pool.Size, settings.Pool.Cmd, settings.Pool.PortRange )
-	gateway := NewGateway( settings.ListenAddress, pool )
-  
+	pool := NewPool(settings.Pool.Size, settings.Pool.Cmd, settings.Pool.PortRange)
+	gateway := NewGateway(settings.ListenAddress, pool)
+
 	go gateway.Serve()
 
-  c := make(chan os.Signal, 1)
-  signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGTERM)
-  <-c
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGTERM)
+	<-c
 
-  os.Remove("/tmp/gateway")
+	os.Remove("/tmp/gateway")
 }
