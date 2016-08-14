@@ -1,8 +1,7 @@
 {
-  "listen_address": ":5555",
+  "listen_address": "/tmp/gateway",
   "pool": {
-    "pool_size": 2,
-    "pool_cmd": ["node", "samples/hello-world/nodejs/node-grpc-server.js"],
-    "port_port_range": [25000, 26000]
+    "pool_size": 6,
+    "pool_cmd": ["node", "samples/hello-world/nodejs/server.js"]
   }
 }
