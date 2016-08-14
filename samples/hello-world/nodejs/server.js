@@ -37,12 +37,14 @@ var path = require('path'),
 var PROTO_PATH = path.resolve(__dirname, '../proto/', 'helloworld.proto'),
     hello_proto = grpc.load( PROTO_PATH ).helloworld;
 
-var port = process.env.PORT
-if(!port) {
+var socket_path = process.argv[process.argv.length-1]
+
+console.log('socket_path:', socket_path)
+if(!socket_path) {
   console.log('No port specified')
   process.exit(1);
 }
-var listen_address = ['127.0.0.1', port].join(':')
+var listen_address = ['unix:', socket_path].join('')
 
 function sayHello(call, callback) {
   callback(null, {message: 'Hello ' + call.request.name});
