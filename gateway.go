@@ -34,5 +34,6 @@ func (g *Gateway) Serve() (err error) {
   g.pool.Start()
 	g.listener, err = net.Listen("tcp", g.listenAddress)
 	g.grpc = grpc.NewServer()
+  g.grpc.Serve(g.listener)
 	return err
 }
