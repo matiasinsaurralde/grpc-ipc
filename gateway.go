@@ -10,19 +10,28 @@ type Gateway struct {
 	grpc          *grpc.Server
 	listener      net.Listener
 	listenAddress string
+  pool *Pool
 }
 
 // NewGateway initializes a new Gateway data structure.
-func NewGateway(listenAddress string) Gateway {
-	gw := Gateway{
+func NewGateway(listenAddress string, initialPool *Pool) *Gateway {
+	gw := &Gateway{
 		grpc:          grpc.NewServer(),
 		listenAddress: listenAddress,
 	}
+
+  if initialPool != nil {
+    gw.pool =  initialPool
+  } else {
+    gw.pool = &Pool{}
+  }
+
 	return gw
 }
 
 // Serve starts the internal grpc server
 func (g *Gateway) Serve() (err error) {
+  g.pool.Start()
 	g.listener, err = net.Listen("tcp", g.listenAddress)
 	g.grpc = grpc.NewServer()
 	return err
