@@ -25,7 +25,8 @@ func init() {
 }
 
 func main() {
-	gateway := NewGateway(settings.ListenAddress)
+  pool := NewPool( settings.Pool.Size, settings.Pool.Cmd, settings.Pool.PortRange )
+	gateway := NewGateway( settings.ListenAddress, pool )
 	err := gateway.Serve()
 	if err != nil {
 		panic(err)
