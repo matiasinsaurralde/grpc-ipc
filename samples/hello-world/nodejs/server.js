@@ -31,10 +31,11 @@
  *
  */
 
-var PROTO_PATH = __dirname + '../proto/';
+var path = require('path'),
+    grpc = require('grpc')
 
-var grpc = require('grpc');
-var hello_proto = grpc.load('../proto/helloworld.proto').helloworld;
+var PROTO_PATH = path.resolve(__dirname, '../proto/', 'helloworld.proto'),
+    hello_proto = grpc.load( PROTO_PATH ).helloworld;
 
 var port = process.env.PORT
 if(!port) {
