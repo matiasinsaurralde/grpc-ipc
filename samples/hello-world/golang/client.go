@@ -45,7 +45,7 @@ import (
 )
 
 const (
-	address     = "/tmp/gogo"
+	address     = "/tmp/gateway"
 	defaultName = "world"
 )
 
