@@ -1,4 +1,4 @@
-package main
+package grpc_ipc
 
 import (
 	"encoding/json"
@@ -9,25 +9,32 @@ import (
 	"syscall"
 )
 
-var settings *SettingsSpec
+// var settings *SettingsSpec
 
 func init() {
 	log.Println("Starting grpc-ipc")
+}
 
-	var settingsData []byte
-	var err error
+func LoadConfig(path string) (*SettingsSpec, error) {
+  var settingsData []byte
+  var err error
 
-	settingsData, err = ioutil.ReadFile("settings.json")
-	if err != nil {
-		panic(err)
-	}
+  settingsData, err = ioutil.ReadFile(path)
+  if err != nil {
+    panic(err)
+  }
 
-	settings = &SettingsSpec{}
+  var settings *SettingsSpec
+  err = json.Unmarshal(settingsData, &settings)
 
-	json.Unmarshal(settingsData, settings)
+  return settings, err
 }
 
 func main() {
+  var settings *SettingsSpec
+
+  settings, _ = LoadConfig("settings.json")
+
 	pool := NewPool(settings.Pool.Size, settings.Pool.Cmd, settings.Pool.PortRange)
 	gateway := NewGateway(settings.ListenAddress, pool)
 
