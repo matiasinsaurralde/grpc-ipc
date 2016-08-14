@@ -13,12 +13,14 @@ import (
 
 const uriPrefix string = "grpc_ipc_"
 
+// Worker represents a single process in the pool.
 type Worker struct {
 	pool   *Pool
 	addr   *net.UnixAddr
 	output io.ReadCloser
 }
 
+// Prepare will set the socket path.
 func (w *Worker) Prepare() (err error) {
   socketFile := strings.Join([]string{uriPrefix, uniuri.New()}, "")
 	socketPath := path.Join("/tmp", socketFile)
@@ -27,6 +29,7 @@ func (w *Worker) Prepare() (err error) {
 	return err
 }
 
+// Start starts the worker process.
 func (w *Worker) Start() (err error) {
 	args := make([]string, len(w.pool.Cmd)+1)
 	copy(args, w.pool.Cmd)
