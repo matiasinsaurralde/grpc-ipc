@@ -1,0 +1,7 @@
+{
+  "listen_address": "/tmp/gateway",
+  "pool": {
+    "pool_size": 4,
+    "pool_cmd": ["node", "../hello-world/nodejs/server.js"]
+  }
+}
