@@ -1,14 +1,14 @@
 package main
 
 import (
-	"google.golang.org/grpc"
 	"net"
+  "log"
+  "io"
 )
 
 // Gateway holds the basic gateway structure, the grpc.Server is contained here. It should be possible to create more than one "gateway" instance.
 type Gateway struct {
-	grpc          *grpc.Server
-	listener      net.Listener
+	listener      *net.UnixListener
 	listenAddress string
   pool *Pool
 }
@@ -16,7 +16,6 @@ type Gateway struct {
 // NewGateway initializes a new Gateway data structure.
 func NewGateway(listenAddress string, initialPool *Pool) *Gateway {
 	gw := &Gateway{
-		grpc:          grpc.NewServer(),
 		listenAddress: listenAddress,
 	}
 
@@ -32,8 +31,41 @@ func NewGateway(listenAddress string, initialPool *Pool) *Gateway {
 // Serve starts the internal grpc server
 func (g *Gateway) Serve() (err error) {
   g.pool.Start()
-	g.listener, err = net.Listen("tcp", g.listenAddress)
-	g.grpc = grpc.NewServer()
-  g.grpc.Serve(g.listener)
+
+  var gatewayAddress *net.UnixAddr
+  gatewayAddress, err = net.ResolveUnixAddr( "unix", g.listenAddress )
+
+	g.listener, err = net.ListenUnix("unix", gatewayAddress)
+  defer g.listener.Close()
+
+  for {
+    conn, err := g.listener.AcceptUnix()
+    defer conn.Close()
+
+    if err != nil {
+      log.Println("Error:", err)
+    }
+
+    go g.handle(conn)
+  }
+
 	return err
+}
+
+// Handle connection I/O
+func (g *Gateway) handle(conn *net.UnixConn) {
+  worker := g.pool.PickWorker()
+  // log.Println("Picking worker", worker.addr)
+  proxyConn, _ := net.DialUnix("unix", nil, worker.addr)
+  go copyAndClose(proxyConn, conn)
+  go copyAndClose(conn, proxyConn)
+}
+
+// As seen in github.com/elazarl/goproxy
+func copyAndClose(dst, src *net.UnixConn) {
+	if _, err := io.Copy(dst, src); err != nil {
+		log.Println("Error:", err)
+	}
+	dst.CloseWrite()
+	src.CloseRead()
 }
