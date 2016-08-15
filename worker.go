@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
 	"os/exec"
 	"path"
 	"strings"
@@ -17,6 +18,7 @@ const uriPrefix string = "grpc_ipc_"
 type Worker struct {
 	pool   *Pool
 	addr   *net.UnixAddr
+	conn *net.UnixConn
 	output io.ReadCloser
 }
 
@@ -47,6 +49,27 @@ func (w *Worker) Start() (err error) {
 		if err := cmd.Wait(); err != nil {
 			log.Println("Error:", err)
 		}
+		return
 	}(args)
+
+	go func() {
+		var err error
+		for {
+			_, err = os.Stat(w.addr.Name)
+			if err == nil {
+				break
+			}
+		}
+		for {
+			w.conn, err = net.DialUnix("unix", nil, w.addr)
+			if err == nil && w.conn != nil {
+				break
+			}
+		}
+
+		log.Println("Worker connection established:", *w.conn)
+		return
+	}()
+
 	return err
 }
